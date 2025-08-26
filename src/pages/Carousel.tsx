@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "../store";
-import { setActiveIndex, nextImage, prevImage } from "../store/slices/carouselSlice";
 import {
   Box,
   Typography,
@@ -16,23 +15,27 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const VISIBLE_COUNT = 7;
 
 export default function Carousel() {
-  const dispatch = useDispatch();
-  const { images, activeIndex } = useSelector((state: RootState) => state.carousel);
+  const { files } = useSelector((state: RootState) => state.upload);
   const theme = useTheme();
 
+  const images = files.filter((f) => f.status === "success");
+
+  const [activeIndex, setActiveIndex] = useState(0);
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
-        dispatch(nextImage());
+        setActiveIndex((prev) => (prev + 1) % images.length);
       } else if (e.key === "ArrowLeft") {
-        dispatch(prevImage());
+        setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+      } else if (e.key === "Enter") {
+        // Optional: could zoom or toggle fullscreen
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch]);
+  }, [images.length]);
 
   useEffect(() => {
     if (activeIndex < offset) {
@@ -44,8 +47,11 @@ export default function Carousel() {
 
   if (images.length === 0) {
     return (
-      <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
-        No images available
+      <Typography
+        variant="h6"
+        sx={{ textAlign: "center", mt: 4, marginLeft: "1em" }}
+      >
+        No uploaded images available
       </Typography>
     );
   }
@@ -71,6 +77,7 @@ export default function Carousel() {
       >
         Carousel
       </Typography>
+
       <Card
         sx={{
           maxWidth: 500,
@@ -82,8 +89,8 @@ export default function Carousel() {
       >
         <CardMedia
           component="img"
-          image={images[activeIndex].url}
-          alt={images[activeIndex].alt}
+          image={images[activeIndex]?.url}
+          alt={images[activeIndex]?.name}
           sx={{
             borderRadius: 2,
             objectFit: "contain",
@@ -94,7 +101,11 @@ export default function Carousel() {
       </Card>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <IconButton onClick={() => dispatch(prevImage())}>
+        <IconButton
+          onClick={() =>
+            setActiveIndex((prev) => (prev - 1 + images.length) % images.length)
+          }
+        >
           <ArrowBackIosNewIcon />
         </IconButton>
 
@@ -111,7 +122,7 @@ export default function Carousel() {
             return (
               <Card
                 key={img.id}
-                onClick={() => dispatch(setActiveIndex(globalIndex))}
+                onClick={() => setActiveIndex(globalIndex)}
                 sx={{
                   border:
                     globalIndex === activeIndex
@@ -127,7 +138,7 @@ export default function Carousel() {
                 <CardMedia
                   component="img"
                   image={img.url}
-                  alt={img.alt}
+                  alt={img.name}
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Card>
@@ -135,7 +146,9 @@ export default function Carousel() {
           })}
         </Box>
 
-        <IconButton onClick={() => dispatch(nextImage())}>
+        <IconButton
+          onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
+        >
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>

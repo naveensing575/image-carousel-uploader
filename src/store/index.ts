@@ -1,11 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import uploadReducer from "./slices/uploadSlice";
-import carouselReducer from "./slices/carouselSlice";
 
 export const store = configureStore({
   reducer: {
     upload: uploadReducer,
-    carousel: carouselReducer,
   },
 });
 
