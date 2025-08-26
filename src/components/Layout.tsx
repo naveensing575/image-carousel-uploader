@@ -1,3 +1,4 @@
+// src/components/Layout.tsx
 import { Box, IconButton, useTheme } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -19,7 +20,7 @@ export default function Layout({ children, mode, toggleMode }: LayoutProps) {
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Box
         sx={{
-          width: 80,
+          width: { xs: 60, sm: 80 },
           bgcolor: "background.default",
           display: "flex",
           flexDirection: "column",
@@ -72,6 +73,7 @@ export default function Layout({ children, mode, toggleMode }: LayoutProps) {
           flex: 1,
           bgcolor: "background.default",
           color: "text.primary",
+          overflowY: "auto",
         }}
       >
         {children}

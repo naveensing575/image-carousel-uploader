@@ -1,8 +1,10 @@
+// src/pages/Upload.tsx
 import { type ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
 import { addFiles } from "../store/slices/uploadSlice";
 import { v4 as uuid } from "uuid";
 import { Button, Typography, Box } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import FileList from "../components/upload/FileList";
 import { startUpload } from "../utils/uploadManager";
 import { type AppDispatch } from "../store";
@@ -49,7 +51,7 @@ export default function Upload() {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 4 } }}>
       <Typography variant="h5" gutterBottom>
         Upload
       </Typography>
@@ -57,13 +59,15 @@ export default function Upload() {
       <Button
         variant="contained"
         component="label"
+        endIcon={<CloudUploadIcon />}
         sx={{
           bgcolor: "#FFC107",
           color: "black",
           fontWeight: "bold",
           borderRadius: "30px",
-          px: 4,
-          py: 1.5,
+          px: { xs: 2, sm: 4 },
+          py: { xs: 1, sm: 1.5 },
+          fontSize: { xs: "0.8rem", sm: "1rem" },
           "&:hover": { bgcolor: "#e6ac00" },
         }}
       >

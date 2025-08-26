@@ -1,3 +1,4 @@
+// src/pages/Carousel.tsx
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
@@ -29,8 +30,6 @@ export default function Carousel() {
         setActiveIndex((prev) => (prev + 1) % images.length);
       } else if (e.key === "ArrowLeft") {
         setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
-      } else if (e.key === "Enter") {
-        // Optional: could zoom or toggle fullscreen
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -49,7 +48,7 @@ export default function Carousel() {
     return (
       <Typography
         variant="h6"
-        sx={{ textAlign: "center", mt: 4, marginLeft: "1em" }}
+        sx={{ textAlign: "center", mt: 4, mx: { xs: 2, sm: "1em" } }}
       >
         No uploaded images available
       </Typography>
@@ -64,7 +63,7 @@ export default function Carousel() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        p: 3,
+        p: { xs: 2, sm: 3 },
         bgcolor: "background.default",
         height: "100%",
       }}
@@ -73,14 +72,14 @@ export default function Carousel() {
         variant="h4"
         component="h1"
         gutterBottom
-        sx={{ fontWeight: "bold", mb: 2 }}
+        sx={{ fontWeight: "bold", mb: 2, fontSize: { xs: "1.5rem", sm: "2rem" } }}
       >
         Carousel
       </Typography>
 
       <Card
         sx={{
-          maxWidth: 500,
+          maxWidth: { xs: "100%", sm: 500 },
           width: "100%",
           mb: 2,
           bgcolor: "transparent",
@@ -94,7 +93,7 @@ export default function Carousel() {
           sx={{
             borderRadius: 2,
             objectFit: "contain",
-            maxHeight: "70vh",
+            maxHeight: { xs: "50vh", sm: "70vh" },
             width: "100%",
           }}
         />
@@ -114,7 +113,7 @@ export default function Carousel() {
             display: "flex",
             gap: 1,
             overflow: "hidden",
-            width: `${VISIBLE_COUNT * 80}px`,
+            width: { xs: `${VISIBLE_COUNT * 50}px`, sm: `${VISIBLE_COUNT * 80}px` },
           }}
         >
           {visibleImages.map((img, idx) => {
@@ -131,8 +130,8 @@ export default function Carousel() {
                   borderRadius: 2,
                   overflow: "hidden",
                   cursor: "pointer",
-                  width: 80,
-                  height: 80,
+                  width: { xs: 50, sm: 80 },
+                  height: { xs: 50, sm: 80 },
                 }}
               >
                 <CardMedia
