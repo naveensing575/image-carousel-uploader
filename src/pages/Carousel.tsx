@@ -89,6 +89,7 @@ export default function Carousel() {
           component="img"
           image={images[activeIndex]?.url}
           alt={images[activeIndex]?.name}
+          loading="lazy"
           sx={{
             borderRadius: 2,
             objectFit: "contain",
@@ -103,6 +104,7 @@ export default function Carousel() {
           onClick={() =>
             setActiveIndex((prev) => (prev - 1 + images.length) % images.length)
           }
+          aria-label="Previous image"
         >
           <ArrowBackIosNewIcon />
         </IconButton>
@@ -117,26 +119,39 @@ export default function Carousel() {
         >
           {visibleImages.map((img, idx) => {
             const globalIndex = offset + idx;
+            const isActive = globalIndex === activeIndex;
             return (
               <Card
                 key={img.id}
                 onClick={() => setActiveIndex(globalIndex)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setActiveIndex(globalIndex);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-pressed={isActive}
                 sx={{
-                  border:
-                    globalIndex === activeIndex
-                      ? "3px solid #FFC107"
-                      : `2px solid ${theme.palette.divider}`,
+                  border: isActive
+                    ? "3px solid #FFC107"
+                    : `2px solid ${theme.palette.divider}`,
                   borderRadius: 2,
                   overflow: "hidden",
                   cursor: "pointer",
+                  outline: "none",
                   width: { xs: 50, sm: 80 },
                   height: { xs: 50, sm: 80 },
+                  "&:focus": {
+                    boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
+                  },
                 }}
               >
                 <CardMedia
                   component="img"
                   image={img.url}
                   alt={img.name}
+                  loading="lazy"
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Card>
@@ -146,6 +161,7 @@ export default function Carousel() {
 
         <IconButton
           onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
+          aria-label="Next image"
         >
           <ArrowForwardIosIcon />
         </IconButton>
