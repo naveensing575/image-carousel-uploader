@@ -13,7 +13,15 @@ interface CarouselState {
 }
 
 const initialState: CarouselState = {
-  images: [],
+  images: [
+    { id: "1", url: "https://picsum.photos/id/1015/800/500", alt: "Mountain" },
+    { id: "2", url: "https://picsum.photos/id/1025/800/500", alt: "Dog" },
+    { id: "3", url: "https://picsum.photos/id/1035/800/500", alt: "River" },
+    { id: "4", url: "https://picsum.photos/id/1045/800/500", alt: "Forest" },
+    { id: "5", url: "https://picsum.photos/id/1066/800/500", alt: "Desert" },
+    { id: "6", url: "https://picsum.photos/id/1072/800/500", alt: "truck" },
+    { id: "7", url: "https://picsum.photos/id/1081/800/500", alt: "pyramid" },
+  ],
   activeIndex: 0,
 };
 
@@ -21,10 +29,6 @@ const carouselSlice = createSlice({
   name: "carousel",
   initialState,
   reducers: {
-    setImages: (state, action: PayloadAction<CarouselImage[]>) => {
-      state.images = action.payload;
-      state.activeIndex = 0;
-    },
     setActiveIndex: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload < state.images.length) {
         state.activeIndex = action.payload;
@@ -44,6 +48,5 @@ const carouselSlice = createSlice({
   },
 });
 
-export const { setImages, setActiveIndex, nextImage, prevImage } =
-  carouselSlice.actions;
+export const { setActiveIndex, nextImage, prevImage } = carouselSlice.actions;
 export default carouselSlice.reducer;

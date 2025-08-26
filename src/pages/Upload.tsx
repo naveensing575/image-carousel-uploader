@@ -1,63 +1,59 @@
 import { type ChangeEvent } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../store";
-import {
-  addFiles,
-  updateProgress,
-  updateStatus,
-} from "../store/slices/uploadSlice";
+import { useDispatch } from "react-redux";
+import { addFiles } from "../store/slices/uploadSlice";
 import { v4 as uuid } from "uuid";
-import {
-  Button,
-  Typography,
-  List,
-  ListItem,
-  LinearProgress,
-  Box,
-} from "@mui/material";
+import { Button, Typography, Box } from "@mui/material";
+import FileList from "../components/upload/FileList";
 
 export default function Upload() {
   const dispatch = useDispatch();
-  const files = useSelector((state: RootState) => state.upload.files);
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files;
     if (!selected) return;
 
-    const newFiles = Array.from(selected).map((file) => ({
+    const validFiles = Array.from(selected).filter((file) => {
+      const isValidType =
+        file.type === "image/jpeg" || file.type === "image/jpg";
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      return isValidType && isValidSize;
+    });
+
+    const newFiles = validFiles.map((file) => ({
       id: uuid(),
       name: file.name,
       size: file.size,
+      url: URL.createObjectURL(file),
       progress: 0,
       status: "uploading" as const,
     }));
 
-    dispatch(addFiles(newFiles));
-
-    // simulate upload progress
-    newFiles.forEach((file) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        if (progress <= 100) {
-          dispatch(updateProgress({ id: file.id, progress }));
-        }
-        if (progress >= 100) {
-          clearInterval(interval);
-          dispatch(updateStatus({ id: file.id, status: "success" }));
-        }
-      }, 300);
-    });
+    if (newFiles.length > 0) {
+      dispatch(addFiles(newFiles));
+    }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <Box sx={{ p: 4 }}>
       <Typography variant="h5" gutterBottom>
-        Upload Images
+        Upload
       </Typography>
 
-      <Button variant="contained" component="label">
-        Select Images
+      {/* Yellow Upload Button */}
+      <Button
+        variant="contained"
+        component="label"
+        sx={{
+          bgcolor: "#FFC107",
+          color: "black",
+          fontWeight: "bold",
+          borderRadius: "30px",
+          px: 4,
+          py: 1.5,
+          "&:hover": { bgcolor: "#e6ac00" },
+        }}
+      >
+        UPLOAD PHOTOS
         <input
           type="file"
           hidden
@@ -67,17 +63,7 @@ export default function Upload() {
         />
       </Button>
 
-      <List>
-        {files.map((f) => (
-          <ListItem key={f.id} sx={{ flexDirection: "column", alignItems: "flex-start" }}>
-            <Typography>{f.name} ({(f.size / 1024).toFixed(1)} KB)</Typography>
-            <Box sx={{ width: "100%", mt: 1 }}>
-              <LinearProgress variant="determinate" value={f.progress} />
-            </Box>
-            <Typography variant="body2">Status: {f.status}</Typography>
-          </ListItem>
-        ))}
-      </List>
-    </div>
+      <FileList />
+    </Box>
   );
 }

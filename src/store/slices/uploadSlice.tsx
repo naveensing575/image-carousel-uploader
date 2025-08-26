@@ -4,6 +4,7 @@ export interface UploadFile {
   id: string;
   name: string;
   size: number;
+  url: string;
   progress: number;
   status: "uploading" | "success" | "error" | "paused";
 }
@@ -37,8 +38,16 @@ const uploadSlice = createSlice({
       const file = state.files.find((f) => f.id === action.payload.id);
       if (file) file.status = action.payload.status;
     },
+    resetFile: (state, action: PayloadAction<{ id: string }>) => {
+      const file = state.files.find((f) => f.id === action.payload.id);
+      if (file) {
+        file.progress = 0;
+        file.status = "uploading";
+      }
+    },
   },
 });
 
-export const { addFiles, updateProgress, updateStatus } = uploadSlice.actions;
+export const { addFiles, updateProgress, updateStatus, resetFile } =
+  uploadSlice.actions;
 export default uploadSlice.reducer;
