@@ -1,46 +1,68 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
 import { setActiveIndex } from "../store/slices/carouselSlice";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Card,
+  CardMedia,
+  ImageList,
+  ImageListItem,
+  Paper,
+} from "@mui/material";
 
 export default function Carousel() {
   const dispatch = useDispatch();
-  const { images, activeIndex } = useSelector((state: RootState) => state.carousel);
+  const { images, activeIndex } = useSelector(
+    (state: RootState) => state.carousel
+  );
 
   if (images.length === 0) {
-    return <Typography>No images available</Typography>;
+    return (
+      <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
+        No images available
+      </Typography>
+    );
   }
 
   return (
-    <Box sx={{ padding: "2rem", textAlign: "center" }}>
+    <Box sx={{ padding: "2rem" }}>
       {/* Large image */}
-      <Box sx={{ mb: 2 }}>
-        <img
-          src={images[activeIndex].url}
+      <Card sx={{ maxWidth: "80%", margin: "0 auto", mb: 3 }}>
+        <CardMedia
+          component="img"
+          height="500"
+          image={images[activeIndex].url}
           alt={images[activeIndex].alt}
-          style={{ width: "80%", borderRadius: "8px" }}
+          sx={{ borderRadius: 2 }}
         />
-      </Box>
+      </Card>
 
       {/* Thumbnails */}
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-        {images.map((img, idx) => (
-          <img
-            key={img.id}
-            src={img.url}
-            alt={img.alt}
-            onClick={() => dispatch(setActiveIndex(idx))}
-            style={{
-              width: "100px",
-              height: "60px",
-              objectFit: "cover",
-              border: idx === activeIndex ? "3px solid blue" : "2px solid gray",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          />
-        ))}
-      </Box>
+      <Paper elevation={3} sx={{ p: 2, overflowX: "auto" }}>
+        <ImageList cols={7} rowHeight={100} sx={{ flexWrap: "nowrap" }}>
+          {images.map((img, idx) => (
+            <ImageListItem key={img.id} sx={{ cursor: "pointer" }}>
+              <Card
+                onClick={() => dispatch(setActiveIndex(idx))}
+                sx={{
+                  border:
+                    idx === activeIndex ? "3px solid #1976d2" : "2px solid gray",
+                  borderRadius: 2,
+                  overflow: "hidden",
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={img.url}
+                  alt={img.alt}
+                  sx={{ height: 100, objectFit: "cover" }}
+                />
+              </Card>
+            </ImageListItem>
+          ))}
+        </ImageList>
+      </Paper>
     </Box>
   );
 }

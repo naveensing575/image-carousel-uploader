@@ -8,8 +8,11 @@ import {
   Typography,
   LinearProgress,
   Box,
-  Button,
+  IconButton,
 } from "@mui/material";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ReplayIcon from "@mui/icons-material/Replay";
 
 interface FileItemProps {
   file: UploadFile;
@@ -31,34 +34,41 @@ export default function FileItem({ file }: FileItemProps) {
   };
 
   return (
-    <ListItem sx={{ flexDirection: "column", alignItems: "flex-start" }}>
-      <Typography>
-        {file.name} ({(file.size / 1024).toFixed(1)} KB)
-      </Typography>
+    <ListItem sx={{ flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
+      <Typography>{file.name}</Typography>
 
-      <Box sx={{ width: "100%", mt: 1 }}>
-        <LinearProgress variant="determinate" value={file.progress} />
-      </Box>
+      <Box sx={{ display: "flex", alignItems: "center", width: "100%", mt: 1 }}>
+        <Box sx={{ flex: 1, mr: 2 }}>
+          <LinearProgress
+            variant="determinate"
+            value={file.progress}
+            sx={{
+              height: 8,
+              borderRadius: 5,
+              "& .MuiLinearProgress-bar": {
+                bgcolor: "#FFC107",
+              },
+            }}
+          />
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {file.progress}% uploaded
+          </Typography>
+        </Box>
 
-      <Typography variant="body2" sx={{ mt: 1 }}>
-        Status: {file.status}
-      </Typography>
-
-      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
         {file.status === "uploading" && (
-          <Button size="small" variant="outlined" onClick={handlePause}>
-            Pause
-          </Button>
+          <IconButton onClick={handlePause} sx={{ bgcolor: "grey.800", color: "#FFC107" }}>
+            <PauseIcon />
+          </IconButton>
         )}
         {file.status === "paused" && (
-          <Button size="small" variant="contained" onClick={handleResume}>
-            Resume
-          </Button>
+          <IconButton onClick={handleResume} sx={{ bgcolor: "grey.800", color: "#FFC107" }}>
+            <PlayArrowIcon />
+          </IconButton>
         )}
         {file.status === "error" && (
-          <Button size="small" color="error" onClick={handleRetry}>
-            Retry
-          </Button>
+          <IconButton onClick={handleRetry} sx={{ bgcolor: "grey.800", color: "#FFC107" }}>
+            <ReplayIcon />
+          </IconButton>
         )}
       </Box>
     </ListItem>
