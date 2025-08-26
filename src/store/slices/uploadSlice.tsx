@@ -4,7 +4,7 @@ export interface UploadFile {
   id: string;
   name: string;
   size: number;
-  url: string;
+  url: string; // preview + carousel use
   progress: number;
   status: "uploading" | "success" | "error" | "paused";
 }
@@ -45,9 +45,21 @@ const uploadSlice = createSlice({
         file.status = "uploading";
       }
     },
+    removeFile: (state, action: PayloadAction<{ id: string }>) => {
+      state.files = state.files.filter((f) => f.id !== action.payload.id);
+    },
+    clearAllFiles: (state) => {
+      state.files = [];
+    },
   },
 });
 
-export const { addFiles, updateProgress, updateStatus, resetFile } =
-  uploadSlice.actions;
+export const {
+  addFiles,
+  updateProgress,
+  updateStatus,
+  resetFile,
+  removeFile,
+  clearAllFiles,
+} = uploadSlice.actions;
 export default uploadSlice.reducer;

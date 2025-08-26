@@ -1,12 +1,14 @@
 import { type ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
-import { addFiles } from "../store/slices/uploadSlice";
+import { addFiles} from "../store/slices/uploadSlice";
 import { v4 as uuid } from "uuid";
 import { Button, Typography, Box } from "@mui/material";
 import FileList from "../components/upload/FileList";
+import { startUpload } from "../utils/uploadManager";
+import { type AppDispatch } from "../store";
 
 export default function Upload() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files;
@@ -15,7 +17,7 @@ export default function Upload() {
     const validFiles = Array.from(selected).filter((file) => {
       const isValidType =
         file.type === "image/jpeg" || file.type === "image/jpg";
-      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      const isValidSize = file.size <= 5 * 1024 * 1024;
       return isValidType && isValidSize;
     });
 
@@ -30,6 +32,7 @@ export default function Upload() {
 
     if (newFiles.length > 0) {
       dispatch(addFiles(newFiles));
+      newFiles.forEach((f) => startUpload(f.id, dispatch));
     }
   };
 
@@ -39,7 +42,6 @@ export default function Upload() {
         Upload
       </Typography>
 
-      {/* Yellow Upload Button */}
       <Button
         variant="contained"
         component="label"

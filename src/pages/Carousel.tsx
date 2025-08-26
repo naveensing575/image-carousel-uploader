@@ -17,10 +17,13 @@ const VISIBLE_COUNT = 7;
 
 export default function Carousel() {
   const dispatch = useDispatch();
-  const { images, activeIndex } = useSelector((state: RootState) => state.carousel);
+  const { activeIndex } = useSelector((state: RootState) => state.carousel);
+  const { files } = useSelector((state: RootState) => state.upload);
   const theme = useTheme();
 
   const [offset, setOffset] = useState(0);
+
+  const images = files.filter((f) => f.status === "success"); // 👈 only completed uploads
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -45,7 +48,7 @@ export default function Carousel() {
   if (images.length === 0) {
     return (
       <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
-        No images available
+        No uploaded images available
       </Typography>
     );
   }
@@ -71,6 +74,7 @@ export default function Carousel() {
       >
         Carousel
       </Typography>
+
       <Card
         sx={{
           maxWidth: 500,
@@ -82,8 +86,8 @@ export default function Carousel() {
       >
         <CardMedia
           component="img"
-          image={images[activeIndex].url}
-          alt={images[activeIndex].alt}
+          image={images[activeIndex]?.url}
+          alt={images[activeIndex]?.name}
           sx={{
             borderRadius: 2,
             objectFit: "contain",
@@ -127,7 +131,7 @@ export default function Carousel() {
                 <CardMedia
                   component="img"
                   image={img.url}
-                  alt={img.alt}
+                  alt={img.name}
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Card>
