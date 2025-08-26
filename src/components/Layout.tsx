@@ -1,4 +1,3 @@
-// src/components/Layout.tsx
 import { Box, IconButton, useTheme } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";

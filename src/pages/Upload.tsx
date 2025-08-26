@@ -1,4 +1,3 @@
-// src/pages/Upload.tsx
 import { type ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
 import { addFiles } from "../store/slices/uploadSlice";
