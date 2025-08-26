@@ -1,21 +1,46 @@
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
-import { setActiveIndex } from "../store/slices/carouselSlice";
+import { setActiveIndex, nextImage, prevImage } from "../store/slices/carouselSlice";
 import {
   Box,
   Typography,
   Card,
   CardMedia,
-  ImageList,
-  ImageListItem,
-  Paper,
+  useTheme,
+  IconButton,
 } from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
+const VISIBLE_COUNT = 7;
 
 export default function Carousel() {
   const dispatch = useDispatch();
-  const { images, activeIndex } = useSelector(
-    (state: RootState) => state.carousel
-  );
+  const { images, activeIndex } = useSelector((state: RootState) => state.carousel);
+  const theme = useTheme();
+
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        dispatch(nextImage());
+      } else if (e.key === "ArrowLeft") {
+        dispatch(prevImage());
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (activeIndex < offset) {
+      setOffset(activeIndex);
+    } else if (activeIndex >= offset + VISIBLE_COUNT) {
+      setOffset(activeIndex - VISIBLE_COUNT + 1);
+    }
+  }, [activeIndex, offset]);
 
   if (images.length === 0) {
     return (
@@ -25,44 +50,95 @@ export default function Carousel() {
     );
   }
 
+  const visibleImages = images.slice(offset, offset + VISIBLE_COUNT);
+
   return (
-    <Box sx={{ padding: "2rem" }}>
-      {/* Large image */}
-      <Card sx={{ maxWidth: "80%", margin: "0 auto", mb: 3 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        p: 3,
+        bgcolor: "background.default",
+        height: "100%",
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{ fontWeight: "bold", mb: 2 }}
+      >
+        Carousel
+      </Typography>
+      <Card
+        sx={{
+          maxWidth: 500,
+          width: "100%",
+          mb: 2,
+          bgcolor: "transparent",
+          boxShadow: "none",
+        }}
+      >
         <CardMedia
           component="img"
-          height="500"
           image={images[activeIndex].url}
           alt={images[activeIndex].alt}
-          sx={{ borderRadius: 2 }}
+          sx={{
+            borderRadius: 2,
+            objectFit: "contain",
+            maxHeight: "70vh",
+            width: "100%",
+          }}
         />
       </Card>
 
-      {/* Thumbnails */}
-      <Paper elevation={3} sx={{ p: 2, overflowX: "auto" }}>
-        <ImageList cols={7} rowHeight={100} sx={{ flexWrap: "nowrap" }}>
-          {images.map((img, idx) => (
-            <ImageListItem key={img.id} sx={{ cursor: "pointer" }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <IconButton onClick={() => dispatch(prevImage())}>
+          <ArrowBackIosNewIcon />
+        </IconButton>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            overflow: "hidden",
+            width: `${VISIBLE_COUNT * 80}px`,
+          }}
+        >
+          {visibleImages.map((img, idx) => {
+            const globalIndex = offset + idx;
+            return (
               <Card
-                onClick={() => dispatch(setActiveIndex(idx))}
+                key={img.id}
+                onClick={() => dispatch(setActiveIndex(globalIndex))}
                 sx={{
                   border:
-                    idx === activeIndex ? "3px solid #1976d2" : "2px solid gray",
+                    globalIndex === activeIndex
+                      ? "3px solid #FFC107"
+                      : `2px solid ${theme.palette.divider}`,
                   borderRadius: 2,
                   overflow: "hidden",
+                  cursor: "pointer",
+                  width: 80,
+                  height: 80,
                 }}
               >
                 <CardMedia
                   component="img"
                   image={img.url}
                   alt={img.alt}
-                  sx={{ height: 100, objectFit: "cover" }}
+                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Card>
-            </ImageListItem>
-          ))}
-        </ImageList>
-      </Paper>
+            );
+          })}
+        </Box>
+
+        <IconButton onClick={() => dispatch(nextImage())}>
+          <ArrowForwardIosIcon />
+        </IconButton>
+      </Box>
     </Box>
   );
 }

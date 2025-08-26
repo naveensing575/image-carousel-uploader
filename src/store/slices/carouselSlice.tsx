@@ -18,7 +18,9 @@ const initialState: CarouselState = {
     { id: "2", url: "https://picsum.photos/id/1025/800/500", alt: "Dog" },
     { id: "3", url: "https://picsum.photos/id/1035/800/500", alt: "River" },
     { id: "4", url: "https://picsum.photos/id/1045/800/500", alt: "Forest" },
-    { id: "5", url: "https://picsum.photos/id/1055/800/500", alt: "Beach" },
+    { id: "5", url: "https://picsum.photos/id/1066/800/500", alt: "Desert" },
+    { id: "6", url: "https://picsum.photos/id/1072/800/500", alt: "truck" },
+    { id: "7", url: "https://picsum.photos/id/1081/800/500", alt: "pyramid" },
   ],
   activeIndex: 0,
 };
@@ -32,8 +34,19 @@ const carouselSlice = createSlice({
         state.activeIndex = action.payload;
       }
     },
+    nextImage: (state) => {
+      if (state.images.length > 0) {
+        state.activeIndex = (state.activeIndex + 1) % state.images.length;
+      }
+    },
+    prevImage: (state) => {
+      if (state.images.length > 0) {
+        state.activeIndex =
+          (state.activeIndex - 1 + state.images.length) % state.images.length;
+      }
+    },
   },
 });
 
-export const { setActiveIndex } = carouselSlice.actions;
+export const { setActiveIndex, nextImage, prevImage } = carouselSlice.actions;
 export default carouselSlice.reducer;

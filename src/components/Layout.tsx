@@ -25,6 +25,7 @@ export default function Layout({ children, mode, toggleMode }: LayoutProps) {
           flexDirection: "column",
           justifyContent: "space-between",
           alignItems: "center",
+          color: "text.primary",
           py: 2,
           borderRight: `1px solid ${theme.palette.divider}`,
         }}
