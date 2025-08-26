@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "../store";
-import { setActiveIndex, nextImage, prevImage } from "../store/slices/carouselSlice";
 import {
   Box,
   Typography,
@@ -16,26 +15,27 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const VISIBLE_COUNT = 7;
 
 export default function Carousel() {
-  const dispatch = useDispatch();
-  const { activeIndex } = useSelector((state: RootState) => state.carousel);
   const { files } = useSelector((state: RootState) => state.upload);
   const theme = useTheme();
 
-  const [offset, setOffset] = useState(0);
+  const images = files.filter((f) => f.status === "success");
 
-  const images = files.filter((f) => f.status === "success"); // 👈 only completed uploads
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
-        dispatch(nextImage());
+        setActiveIndex((prev) => (prev + 1) % images.length);
       } else if (e.key === "ArrowLeft") {
-        dispatch(prevImage());
+        setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+      } else if (e.key === "Enter") {
+        // Optional: could zoom or toggle fullscreen
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch]);
+  }, [images.length]);
 
   useEffect(() => {
     if (activeIndex < offset) {
@@ -47,7 +47,10 @@ export default function Carousel() {
 
   if (images.length === 0) {
     return (
-      <Typography variant="h6" sx={{ textAlign: "center", mt: 4, marginLeft: '1em' }}>
+      <Typography
+        variant="h6"
+        sx={{ textAlign: "center", mt: 4, marginLeft: "1em" }}
+      >
         No uploaded images available
       </Typography>
     );
@@ -98,7 +101,11 @@ export default function Carousel() {
       </Card>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <IconButton onClick={() => dispatch(prevImage())}>
+        <IconButton
+          onClick={() =>
+            setActiveIndex((prev) => (prev - 1 + images.length) % images.length)
+          }
+        >
           <ArrowBackIosNewIcon />
         </IconButton>
 
@@ -115,7 +122,7 @@ export default function Carousel() {
             return (
               <Card
                 key={img.id}
-                onClick={() => dispatch(setActiveIndex(globalIndex))}
+                onClick={() => setActiveIndex(globalIndex)}
                 sx={{
                   border:
                     globalIndex === activeIndex
@@ -139,7 +146,9 @@ export default function Carousel() {
           })}
         </Box>
 
-        <IconButton onClick={() => dispatch(nextImage())}>
+        <IconButton
+          onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
+        >
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
