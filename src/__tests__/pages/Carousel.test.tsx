@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import uploadReducer, { type UploadFile } from "../store/slices/uploadSlice";
-import Carousel from "../pages/Carousel";
+import uploadReducer, { type UploadFile } from "../../store/slices/uploadSlice";
+import Carousel from "../../pages/Carousel";
 
 function renderWithStore(files: UploadFile[]) {
   const store = configureStore({
