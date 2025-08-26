@@ -18,6 +18,7 @@ export function startUpload(
     if (progress >= 100) {
       clearInterval(interval);
       uploadIntervals.delete(id);
+      dispatch(updateProgress({ id, progress: 100 }));
       dispatch(updateStatus({ id, status: "success" }));
     }
   }, 300);
@@ -48,6 +49,7 @@ export function resumeUpload(
     if (progress >= 100) {
       clearInterval(interval);
       uploadIntervals.delete(id);
+      dispatch(updateProgress({ id, progress: 100 }));
       dispatch(updateStatus({ id, status: "success" }));
     }
   }, 300);

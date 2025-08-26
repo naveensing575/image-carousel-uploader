@@ -47,7 +47,7 @@ export default function Carousel() {
 
   if (images.length === 0) {
     return (
-      <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
+      <Typography variant="h6" sx={{ textAlign: "center", mt: 4, marginLeft: '1em' }}>
         No uploaded images available
       </Typography>
     );

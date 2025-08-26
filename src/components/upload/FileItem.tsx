@@ -17,6 +17,7 @@ import {
   Box,
   IconButton,
   Avatar,
+  useTheme,
 } from "@mui/material";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -28,6 +29,7 @@ interface FileItemProps {
 
 export default function FileItem({ file }: FileItemProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
 
   const handlePause = () => {
     pauseUpload(file.id);
@@ -44,6 +46,23 @@ export default function FileItem({ file }: FileItemProps) {
     retryUpload(file.id, dispatch);
   };
 
+  const getStatusText = () => {
+    switch (file.status) {
+      case "uploading":
+        return { text: "Uploading...", color: theme.palette.warning.main };
+      case "paused":
+        return { text: "Paused", color: theme.palette.info.main };
+      case "success":
+        return { text: "Success", color: theme.palette.success.main };
+      case "error":
+        return { text: "Error", color: theme.palette.error.main };
+      default:
+        return { text: "", color: theme.palette.text.secondary };
+    }
+  };
+
+  const { text, color } = getStatusText();
+
   return (
     <ListItem
       sx={{
@@ -57,7 +76,6 @@ export default function FileItem({ file }: FileItemProps) {
         bgcolor: "background.paper",
       }}
     >
-      {/* Thumbnail preview */}
       <Avatar
         variant="rounded"
         src={file.url}
@@ -83,12 +101,9 @@ export default function FileItem({ file }: FileItemProps) {
             />
             <Typography
               variant="body2"
-              sx={{ mt: 0.5, fontStyle: "italic", color: "text.secondary" }}
+              sx={{ mt: 0.5, fontStyle: "italic", color }}
             >
-              {file.status === "uploading" && "Uploading..."}
-              {file.status === "paused" && "Paused"}
-              {file.status === "success" && "Success"}
-              {file.status === "error" && "Error"}
+              {text}
             </Typography>
           </Box>
 

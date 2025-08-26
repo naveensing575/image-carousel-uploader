@@ -1,8 +1,12 @@
 import { type ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
-import { addFiles} from "../store/slices/uploadSlice";
+import { addFiles } from "../store/slices/uploadSlice";
 import { v4 as uuid } from "uuid";
-import { Button, Typography, Box } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
 import FileList from "../components/upload/FileList";
 import { startUpload } from "../utils/uploadManager";
 import { type AppDispatch } from "../store";
@@ -14,11 +18,19 @@ export default function Upload() {
     const selected = e.target.files;
     if (!selected) return;
 
-    const validFiles = Array.from(selected).filter((file) => {
+    const validFiles: File[] = [];
+    const invalidFiles: string[] = [];
+
+    Array.from(selected).forEach((file) => {
       const isValidType =
         file.type === "image/jpeg" || file.type === "image/jpg";
       const isValidSize = file.size <= 5 * 1024 * 1024;
-      return isValidType && isValidSize;
+
+      if (isValidType && isValidSize) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file.name);
+      }
     });
 
     const newFiles = validFiles.map((file) => ({
@@ -33,6 +45,10 @@ export default function Upload() {
     if (newFiles.length > 0) {
       dispatch(addFiles(newFiles));
       newFiles.forEach((f) => startUpload(f.id, dispatch));
+    }
+    
+    if (invalidFiles.length > 0) {
+      console.warn("Invalid files:", invalidFiles);
     }
   };
 
