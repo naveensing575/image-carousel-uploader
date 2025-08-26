@@ -14,7 +14,10 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <Layout mode={mode} toggleMode={() => setMode(mode === "light" ? "dark" : "light")}>
+        <Layout
+          mode={mode}
+          toggleMode={() => setMode(mode === "light" ? "dark" : "light")}
+        >
           <Routes>
             <Route path="/" element={<Upload />} />
             <Route path="/upload" element={<Upload />} />

@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+  "dev": "vite",
+  "build": "npm run lint && npm run format:fix && tsc -b && vite build",
+  "lint": "eslint . --ext .ts,.tsx",
+  "format": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+  "format:fix": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+  "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

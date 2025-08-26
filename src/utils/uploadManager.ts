@@ -6,7 +6,7 @@ const uploadIntervals: Map<string, ReturnType<typeof setInterval>> = new Map();
 export function startUpload(
   id: string,
   dispatch: AppDispatch,
-  resetProgress = 0
+  resetProgress = 0,
 ) {
   let progress = resetProgress;
 
@@ -37,7 +37,7 @@ export function pauseUpload(id: string) {
 export function resumeUpload(
   id: string,
   currentProgress: number,
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
 ) {
   let progress = currentProgress;
 

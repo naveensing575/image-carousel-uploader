@@ -26,14 +26,14 @@ const uploadSlice = createSlice({
     },
     updateProgress: (
       state,
-      action: PayloadAction<{ id: string; progress: number }>
+      action: PayloadAction<{ id: string; progress: number }>,
     ) => {
       const file = state.files.find((f) => f.id === action.payload.id);
       if (file) file.progress = action.payload.progress;
     },
     updateStatus: (
       state,
-      action: PayloadAction<{ id: string; status: UploadFile["status"] }>
+      action: PayloadAction<{ id: string; status: UploadFile["status"] }>,
     ) => {
       const file = state.files.find((f) => f.id === action.payload.id);
       if (file) file.status = action.payload.status;

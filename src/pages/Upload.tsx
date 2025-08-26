@@ -2,11 +2,7 @@ import { type ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
 import { addFiles } from "../store/slices/uploadSlice";
 import { v4 as uuid } from "uuid";
-import {
-  Button,
-  Typography,
-  Box,
-} from "@mui/material";
+import { Button, Typography, Box } from "@mui/material";
 import FileList from "../components/upload/FileList";
 import { startUpload } from "../utils/uploadManager";
 import { type AppDispatch } from "../store";
@@ -46,7 +42,7 @@ export default function Upload() {
       dispatch(addFiles(newFiles));
       newFiles.forEach((f) => startUpload(f.id, dispatch));
     }
-    
+
     if (invalidFiles.length > 0) {
       console.warn("Invalid files:", invalidFiles);
     }
