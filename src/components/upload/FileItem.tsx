@@ -94,7 +94,13 @@ export default function FileItem({ file }: FileItemProps) {
           <Typography
             variant="body1"
             noWrap
-            sx={{ fontWeight: 600, color: "white" }}
+            sx={{
+              fontWeight: 600,
+              color: "text.primary",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: { xs: "160px", sm: "250px" },
+            }}
           >
             {file.name}
           </Typography>

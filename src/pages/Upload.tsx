@@ -82,7 +82,7 @@ export default function Upload() {
       <Typography
         variant="h5"
         gutterBottom
-        sx={{ fontWeight: "bold", color: "white" }}
+        sx={{ fontWeight: "bold", color: "text.primary", }}
       >
         Upload Files
       </Typography>
