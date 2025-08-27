@@ -18,6 +18,8 @@ import {
   IconButton,
   Avatar,
   useTheme,
+  Paper,
+  Stack,
 } from "@mui/material";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -64,75 +66,83 @@ export default function FileItem({ file }: FileItemProps) {
   const { text, color } = getStatusText();
 
   return (
-    <ListItem
+    <Paper
+      elevation={2}
       sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        width: "100%",
-        mb: 2,
-        p: 1,
+        p: 2,
         borderRadius: 2,
         bgcolor: "background.paper",
+        mb: 2,
       }}
     >
-      <Avatar
-        variant="rounded"
-        src={file.url}
-        alt={file.name}
-        sx={{ width: 60, height: 60 }}
-      />
+      <ListItem
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 2,
+          p: 0,
+        }}
+      >
+        <Avatar
+          variant="rounded"
+          src={file.url}
+          alt={file.name}
+          sx={{ width: 64, height: 64 }}
+        />
 
-      <Box sx={{ flex: 1 }}>
-        <Typography sx={{ fontWeight: 500 }}>{file.name}</Typography>
+        <Stack flex={1} spacing={1}>
+          <Typography
+            variant="body1"
+            noWrap
+            sx={{
+              fontWeight: 600,
+              color: "text.primary",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: { xs: "160px", sm: "250px" },
+            }}
+          >
+            {file.name}
+          </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <Box sx={{ flex: 1, mr: 2 }}>
-            <LinearProgress
-              variant="determinate"
-              value={file.progress}
-              sx={{
-                height: 8,
-                borderRadius: 5,
-                "& .MuiLinearProgress-bar": {
-                  bgcolor: "#FFC107",
-                },
-              }}
-            />
-            <Typography
-              variant="body2"
-              sx={{ mt: 0.5, fontStyle: "italic", color }}
-            >
-              {text}
-            </Typography>
-          </Box>
+          <LinearProgress
+            variant="determinate"
+            value={file.progress}
+            sx={{
+              height: 8,
+              borderRadius: 5,
+              "& .MuiLinearProgress-bar": {
+                bgcolor: "#FFC107",
+              },
+            }}
+          />
 
+          <Typography
+            variant="body2"
+            sx={{ fontStyle: "italic", color, fontWeight: 500 }}
+          >
+            {text}
+          </Typography>
+        </Stack>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {file.status === "uploading" && (
-            <IconButton
-              onClick={handlePause}
-              sx={{ bgcolor: "grey.800", color: "#FFC107" }}
-            >
+            <IconButton sx={{ bgcolor: "grey.900", color: "#FFC107" }} onClick={handlePause}>
               <PauseIcon />
             </IconButton>
           )}
           {file.status === "paused" && (
-            <IconButton
-              onClick={handleResume}
-              sx={{ bgcolor: "grey.800", color: "#FFC107" }}
-            >
+            <IconButton sx={{ bgcolor: "grey.900", color: "#FFC107" }} onClick={handleResume}>
               <PlayArrowIcon />
             </IconButton>
           )}
           {file.status === "error" && (
-            <IconButton
-              onClick={handleRetry}
-              sx={{ bgcolor: "grey.800", color: "#FFC107" }}
-            >
+            <IconButton sx={{ bgcolor: "grey.900", color: "#FFC107" }} onClick={handleRetry}>
               <ReplayIcon />
             </IconButton>
           )}
         </Box>
-      </Box>
-    </ListItem>
+      </ListItem>
+    </Paper>
   );
 }

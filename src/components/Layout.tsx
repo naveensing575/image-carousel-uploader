@@ -16,21 +16,32 @@ export default function Layout({ children, mode, toggleMode }: LayoutProps) {
   const theme = useTheme();
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, height: "100vh" }}>
+      {/* Sidebar for desktop / bottom nav for mobile */}
       <Box
         sx={{
-          width: { xs: 60, sm: 80 },
+          width: { xs: "100%", sm: 80 },
+          height: { xs: 60, sm: "100%" },
           bgcolor: "background.default",
           display: "flex",
-          flexDirection: "column",
+          flexDirection: { xs: "row", sm: "column" },
           justifyContent: "space-between",
           alignItems: "center",
           color: "text.primary",
-          py: 2,
-          borderRight: `1px solid ${theme.palette.divider}`,
+          py: { xs: 0, sm: 2 },
+          px: { xs: 2, sm: 0 },
+          borderTop: { xs: `1px solid ${theme.palette.divider}`, sm: "none" },
+          borderRight: { xs: "none", sm: `1px solid ${theme.palette.divider}` },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {/* Nav Icons */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "row", sm: "column" },
+            gap: 2,
+          }}
+        >
           <IconButton
             component={Link}
             to="/upload"
@@ -59,14 +70,13 @@ export default function Layout({ children, mode, toggleMode }: LayoutProps) {
           </IconButton>
         </Box>
 
-        <IconButton
-          onClick={toggleMode}
-          sx={{ color: theme.palette.text.primary }}
-        >
+        {/* Theme Toggle */}
+        <IconButton onClick={toggleMode} sx={{ color: theme.palette.text.primary }}>
           {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
         </IconButton>
       </Box>
 
+      {/* Main Content */}
       <Box
         sx={{
           flex: 1,

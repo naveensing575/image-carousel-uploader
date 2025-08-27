@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
 import {
@@ -12,8 +12,6 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-const VISIBLE_COUNT = 7;
-
 export default function Carousel() {
   const { files } = useSelector((state: RootState) => state.upload);
   const theme = useTheme();
@@ -21,40 +19,62 @@ export default function Carousel() {
   const images = files.filter((f) => f.status === "success");
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [offset, setOffset] = useState(0);
+  const thumbsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const touchStartX = useRef<number | null>(null);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        setActiveIndex((prev) => (prev + 1) % images.length);
-      } else if (e.key === "ArrowLeft") {
-        setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => (prev + 1) % images.length);
   }, [images.length]);
 
   useEffect(() => {
-    if (activeIndex < offset) {
-      setOffset(activeIndex);
-    } else if (activeIndex >= offset + VISIBLE_COUNT) {
-      setOffset(activeIndex - VISIBLE_COUNT + 1);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "ArrowLeft") handlePrev();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleNext, handlePrev]);
+
+  useEffect(() => {
+    const el = thumbsRef.current[activeIndex];
+    if (el) {
+      el.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
     }
-  }, [activeIndex, offset]);
+  }, [activeIndex]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    if (deltaX > 50) {
+      handlePrev();
+    } else if (deltaX < -50) {
+      handleNext();
+    }
+    touchStartX.current = null;
+  };
 
   if (images.length === 0) {
     return (
       <Typography
         variant="h6"
-        sx={{ textAlign: "center", mt: 4, mx: { xs: 2, sm: "1em" } }}
+        sx={{ textAlign: "center", mt: 4, color: "text.primary" }}
       >
         No uploaded images available
       </Typography>
     );
   }
-
-  const visibleImages = images.slice(offset, offset + VISIBLE_COUNT);
 
   return (
     <Box
@@ -71,14 +91,19 @@ export default function Carousel() {
         variant="h4"
         component="h1"
         gutterBottom
-        sx={{ fontWeight: "bold", mb: 2, fontSize: { xs: "1.5rem", sm: "2rem" } }}
+        sx={{
+          fontWeight: "bold",
+          mb: 2,
+          fontSize: { xs: "1.5rem", sm: "2rem" },
+          color: "text.primary",
+        }}
       >
         Carousel
       </Typography>
 
       <Card
         sx={{
-          maxWidth: { xs: "100%", sm: 500 },
+          maxWidth: { xs: "100%", sm: 600 },
           width: "100%",
           mb: 2,
           bgcolor: "transparent",
@@ -89,21 +114,29 @@ export default function Carousel() {
           component="img"
           image={images[activeIndex]?.url}
           alt={images[activeIndex]?.name}
+          loading="lazy"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           sx={{
             borderRadius: 2,
             objectFit: "contain",
-            maxHeight: { xs: "50vh", sm: "70vh" },
+            maxHeight: { xs: "50vh", sm: "65vh" },
             width: "100%",
+            bgcolor: "background.paper",
           }}
         />
       </Card>
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <IconButton
-          onClick={() =>
-            setActiveIndex((prev) => (prev - 1 + images.length) % images.length)
-          }
-        >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          width: "100%",
+          justifyContent: "center",
+        }}
+      >
+        <IconButton onClick={handlePrev} aria-label="Previous image">
           <ArrowBackIosNewIcon />
         </IconButton>
 
@@ -111,32 +144,52 @@ export default function Carousel() {
           sx={{
             display: "flex",
             gap: 1,
-            overflow: "hidden",
-            width: { xs: `${VISIBLE_COUNT * 50}px`, sm: `${VISIBLE_COUNT * 80}px` },
+            overflowX: "auto",
+            px: 1,
+            py: 1.5,
+            scrollBehavior: "smooth",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
           }}
         >
-          {visibleImages.map((img, idx) => {
-            const globalIndex = offset + idx;
+          {images.map((img, idx) => {
+            const isActive = idx === activeIndex;
             return (
               <Card
                 key={img.id}
-                onClick={() => setActiveIndex(globalIndex)}
+                component="div"
+                ref={(el: HTMLDivElement | null) => {
+                  thumbsRef.current[idx] = el;
+                }}
+                onClick={() => setActiveIndex(idx)}
+                tabIndex={0}
+                role="button"
+                aria-pressed={isActive}
                 sx={{
-                  border:
-                    globalIndex === activeIndex
-                      ? "3px solid #FFC107"
-                      : `2px solid ${theme.palette.divider}`,
+                  border: isActive
+                    ? `3px solid ${theme.palette.warning.main}`
+                    : `2px solid ${theme.palette.divider}`,
                   borderRadius: 2,
                   overflow: "hidden",
                   cursor: "pointer",
-                  width: { xs: 50, sm: 80 },
-                  height: { xs: 50, sm: 80 },
+                  outline: "none",
+                  width: { xs: 70, sm: 100 },
+                  height: { xs: 70, sm: 100 },
+                  flexShrink: 0,
+                  transform: isActive ? "scale(1.2)" : "scale(1)",
+                  opacity: isActive ? 1 : 0.6,
+                  zIndex: isActive ? 2 : 1,
+                  transition: "all 0.3s ease",
+                  "&:focus": {
+                    boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
+                  },
                 }}
               >
                 <CardMedia
                   component="img"
                   image={img.url}
                   alt={img.name}
+                  loading="lazy"
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Card>
@@ -144,9 +197,7 @@ export default function Carousel() {
           })}
         </Box>
 
-        <IconButton
-          onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
-        >
+        <IconButton onClick={handleNext} aria-label="Next image">
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
